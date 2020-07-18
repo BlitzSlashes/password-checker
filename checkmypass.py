@@ -1,14 +1,15 @@
 import requests
 import hashlib
 import sys
+from termcolor import colored
 
 
 def request_api_data(query_char):
-    url = 'https://api.pwnedpasswords.com/range/' + query_char
+    url = f"https://api.pwnedpasswords.com/range/{query_char}"
     res = requests.get(url)
     if res.status_code != 200:
         raise RuntimeError(
-            f'Error fething: {res.status_code}, check API and try again')
+            colored(f'Uh oh it looks like there was a error getting info! {res.status_code}, check API and try again', color='red'))
     return res
 
 
@@ -28,14 +29,14 @@ def pwned_api_check(password):
 
 
 def main(args):
-    for password in args:
-        count = pwned_api_check(password)
-        if count:
-            print(
-                f'{password} was found {count} times...I think you should probably change the password mate')
-        else:
-            print(f'{password} was not found! This password is very epic.')
-    return 'done!'
+    if args:
+        for password in args:
+            count = pwned_api_check(password)
+            if count:
+                return f"{colored(password, color='yellow')} was found {colored(count, color='red')} times...I think you should probably change the password mate"
+            else:
+                return colored(f'{password} was not found! This password is very epic.', color='green')
+    return 'Please provide a password!'
 
 
 if __name__ == "__main__":
